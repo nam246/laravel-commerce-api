@@ -1,166 +1,67 @@
-# This file is part of mcustiel/docker-php-tools.
-#
-# docker-php-tools is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# docker-php-tools is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with mcustiel/docker-php-tools.  If not, see <http://www.gnu.org/licenses/>.
+FROM php:8.1-fpm
 
-ARG PHP_DOCKER_IMAGE_TAG=latest
-FROM php:$PHP_DOCKER_IMAGE_TAG
+# Arguments defined in docker-compose.yml
+ARG user=www-data
+ARG uid=1000
 
-# phars directory
-ENV PHARS_DIR /opt/phars
-RUN mkdir -p $PHARS_DIR
-ENV PATH $PHARS_DIR:$PATH
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    nginx \
+    supervisor
 
-RUN apt-get update && \
-    apt-get install --yes --no-install-recommends \
-        aspell-de \
-        aspell-en \
-        aspell-es \
-        curl \
-        git \
-        gzip \
-        imagemagick \
-        libaspell-dev \
-        libbz2-dev \
-        libc-client2007e-dev \
-        libcurl4-gnutls-dev \
-        libedit-dev \
-        libenchant-2-dev \
-        libfreetype6-dev \
-        libgmp-dev \
-        libgraphicsmagick1-dev \
-        libjpeg62-turbo-dev \
-        libkrb5-dev \
-        libldap2-dev \
-        libmagickwand-dev \
-        libonig-dev \
-        libpng-dev \
-        libpspell-dev \
-        libreadline-dev \
-        libsnmp-dev \
-        libssh2-1-dev \
-        libssl-dev \
-        libtidy-dev \
-        libxml2-dev \
-        libxslt-dev \
-        libzip-dev \
-        openssh-client \
-        snmp \
-        subversion \
-        unzip \
-        wget \
-        zip \
-        zlib1g-dev \
-    && rm -r /var/lib/apt/lists/*
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && docker-php-ext-install ldap
-RUN docker-php-ext-install bcmath
-RUN docker-php-ext-install bz2
-RUN docker-php-ext-install calendar
-RUN docker-php-ext-install ctype
-RUN docker-php-ext-install curl
-RUN docker-php-ext-install dba
-RUN docker-php-ext-install dom
-RUN docker-php-ext-install enchant
-RUN docker-php-ext-install exif
-RUN docker-php-ext-install fileinfo
-#RUN docker-php-ext-install filter
-RUN docker-php-ext-install ftp
-RUN docker-php-ext-install gettext
-RUN docker-php-ext-install iconv
-#RUN docker-php-ext-install interbase
-RUN docker-php-ext-install intl
-RUN docker-php-ext-install mbstring
-#RUN docker-php-ext-install mssql
-RUN docker-php-ext-install mysqli
-#RUN docker-php-ext-install oci8
-#RUN docker-php-ext-install odbc
-RUN docker-php-ext-install opcache
-RUN docker-php-ext-install pcntl
-RUN docker-php-ext-install pdo
-#RUN docker-php-ext-install pdo_dblib
-#RUN docker-php-ext-install pdo_firebird
-RUN docker-php-ext-install pdo_mysql
-#RUN docker-php-ext-install pdo_oci
-#RUN docker-php-ext-install pdo_odbc
-#RUN docker-php-ext-install pdo_pgsql
-#RUN docker-php-ext-install pdo_sqlite
-#RUN docker-php-ext-install pgsql
-#RUN docker-php-ext-install phar
-RUN docker-php-ext-install posix
-RUN docker-php-ext-install pspell
-#RUN docker-php-ext-install reflection
-RUN docker-php-ext-install session
-RUN docker-php-ext-install shmop
-RUN docker-php-ext-install simplexml
-RUN docker-php-ext-install snmp
-RUN docker-php-ext-install soap
-RUN docker-php-ext-install sockets
-#RUN docker-php-ext-install spl
-#RUN docker-php-ext-install standard
-RUN docker-php-ext-install sysvmsg
-RUN docker-php-ext-install sysvsem
-RUN docker-php-ext-install sysvshm
-RUN docker-php-ext-install tidy
-RUN docker-php-ext-install xml
-RUN docker-php-ext-install xmlwriter
-RUN docker-php-ext-install xsl
-RUN docker-php-ext-install zip
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Register the COMPOSER_HOME environment variable
-ENV COMPOSER_HOME /composer
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Add global binary directory to PATH and make sure to re-export it
-ENV PATH /composer/vendor/bin:$PATH
+# Create system user
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
 
-# Allow Composer to be run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
+# Set working directory
+WORKDIR /var/www
 
-# Setup composer
-# RUN EXPECTED_SIGNATURE="$(wget -q -O - https://composer.github.io/installer.sig)" && \
-#     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-#     ACTUAL_SIGNATURE="$(php -r "echo hash_file('sha384', 'composer-setup.php');")" && \
-#     if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ] ; then >&2 echo 'ERROR: Invalid installer signature'; rm composer-setup.php; exit 1; fi && \
-#     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
-#     RESULT=$? && \
-#     rm composer-setup.php
-RUN EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')" && \
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")" && \
-    if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ] ; then >&2 echo 'ERROR: Invalid installer checksum'; rm composer-setup.php; exit 1; fi && \
-    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
-    RESULT=$? && \
-    rm composer-setup.php
+# Copy project files
+COPY . .
 
-RUN curl -L http://phpdoc.org/phpDocumentor.phar -o $PHARS_DIR/phpDocumentor
-RUN chmod +x $PHARS_DIR/phpDocumentor
+# Copy nginx configuration
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Box
-RUN echo "phar.readonly=off" > $PHP_INI_DIR/conf.d/phar.ini
+# Copy supervisor configuration
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# CS config for SF2 standards
-RUN composer global require escapestudios/symfony2-coding-standard
-RUN phpcs --config-set installed_paths $COMPOSER_HOME/vendor/escapestudios/symfony2-coding-standard
+# Install project dependencies
+RUN composer install --no-interaction --no-dev --optimize-autoloader
 
-# Memory Limit
-RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
+# Generate application key
+RUN php artisan key:generate
 
-# Time Zone
-RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > $PHP_INI_DIR/conf.d/date_timezone.ini
+# Cache config and routes
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
 
-#VOLUME ["/app"]
-WORKDIR /app
+# Set permissions
+RUN chown -R $user:$user . && \
+    chmod -R 755 storage bootstrap/cache
 
-# Set up the command arguments
-CMD ["-"]
-ENTRYPOINT []
+# Switch to non-root user
+USER $user
+
+# Expose port
+EXPOSE 8080
+
+# Start supervisor
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
