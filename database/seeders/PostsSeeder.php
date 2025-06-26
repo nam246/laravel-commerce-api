@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Articles;
+use App\Models\Posts;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
-class ArticlesSeeder extends Seeder
+class PostsSeeder extends Seeder
 {
     public function run(): void
     {
-        Articles::factory(25)->create();
+        Posts::factory(25)->create();
     }
 }
