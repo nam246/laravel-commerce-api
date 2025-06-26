@@ -65,59 +65,59 @@ RUN apt-get update && \
         zip \
         zlib1g-dev \
     && rm -r /var/lib/apt/lists/*
-    
+
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && docker-php-ext-install ldap
-RUN docker-php-ext-install bcmath 
-RUN docker-php-ext-install bz2 
-RUN docker-php-ext-install calendar 
-RUN docker-php-ext-install ctype 
-RUN docker-php-ext-install curl 
-RUN docker-php-ext-install dba 
-RUN docker-php-ext-install dom 
+RUN docker-php-ext-install bcmath
+RUN docker-php-ext-install bz2
+RUN docker-php-ext-install calendar
+RUN docker-php-ext-install ctype
+RUN docker-php-ext-install curl
+RUN docker-php-ext-install dba
+RUN docker-php-ext-install dom
 RUN docker-php-ext-install enchant
-RUN docker-php-ext-install exif 
-RUN docker-php-ext-install fileinfo 
+RUN docker-php-ext-install exif
+RUN docker-php-ext-install fileinfo
 #RUN docker-php-ext-install filter
-RUN docker-php-ext-install ftp 
+RUN docker-php-ext-install ftp
 RUN docker-php-ext-install gettext
-RUN docker-php-ext-install iconv 
-#RUN docker-php-ext-install interbase 
-RUN docker-php-ext-install intl 
-RUN docker-php-ext-install mbstring 
-#RUN docker-php-ext-install mssql 
-RUN docker-php-ext-install mysqli 
-#RUN docker-php-ext-install oci8 
-#RUN docker-php-ext-install odbc 
-RUN docker-php-ext-install opcache 
-RUN docker-php-ext-install pcntl 
-RUN docker-php-ext-install pdo 
-#RUN docker-php-ext-install pdo_dblib 
-#RUN docker-php-ext-install pdo_firebird 
-RUN docker-php-ext-install pdo_mysql 
-#RUN docker-php-ext-install pdo_oci 
-#RUN docker-php-ext-install pdo_odbc 
-#RUN docker-php-ext-install pdo_pgsql 
-#RUN docker-php-ext-install pdo_sqlite 
-#RUN docker-php-ext-install pgsql 
-#RUN docker-php-ext-install phar 
-RUN docker-php-ext-install posix 
-RUN docker-php-ext-install pspell 
-#RUN docker-php-ext-install reflection 
-RUN docker-php-ext-install session 
-RUN docker-php-ext-install shmop 
-RUN docker-php-ext-install simplexml 
-RUN docker-php-ext-install snmp 
-RUN docker-php-ext-install soap 
-RUN docker-php-ext-install sockets 
-#RUN docker-php-ext-install spl 
-#RUN docker-php-ext-install standard 
-RUN docker-php-ext-install sysvmsg 
-RUN docker-php-ext-install sysvsem 
-RUN docker-php-ext-install sysvshm 
-RUN docker-php-ext-install tidy 
-RUN docker-php-ext-install xml 
-RUN docker-php-ext-install xmlwriter 
-RUN docker-php-ext-install xsl 
+RUN docker-php-ext-install iconv
+#RUN docker-php-ext-install interbase
+RUN docker-php-ext-install intl
+RUN docker-php-ext-install mbstring
+#RUN docker-php-ext-install mssql
+RUN docker-php-ext-install mysqli
+#RUN docker-php-ext-install oci8
+#RUN docker-php-ext-install odbc
+RUN docker-php-ext-install opcache
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-install pdo
+#RUN docker-php-ext-install pdo_dblib
+#RUN docker-php-ext-install pdo_firebird
+RUN docker-php-ext-install pdo_mysql
+#RUN docker-php-ext-install pdo_oci
+#RUN docker-php-ext-install pdo_odbc
+#RUN docker-php-ext-install pdo_pgsql
+#RUN docker-php-ext-install pdo_sqlite
+#RUN docker-php-ext-install pgsql
+#RUN docker-php-ext-install phar
+RUN docker-php-ext-install posix
+RUN docker-php-ext-install pspell
+#RUN docker-php-ext-install reflection
+RUN docker-php-ext-install session
+RUN docker-php-ext-install shmop
+RUN docker-php-ext-install simplexml
+RUN docker-php-ext-install snmp
+RUN docker-php-ext-install soap
+RUN docker-php-ext-install sockets
+#RUN docker-php-ext-install spl
+#RUN docker-php-ext-install standard
+RUN docker-php-ext-install sysvmsg
+RUN docker-php-ext-install sysvsem
+RUN docker-php-ext-install sysvshm
+RUN docker-php-ext-install tidy
+RUN docker-php-ext-install xml
+RUN docker-php-ext-install xmlwriter
+RUN docker-php-ext-install xsl
 RUN docker-php-ext-install zip
 
 # Register the COMPOSER_HOME environment variable
@@ -143,7 +143,7 @@ RUN EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig"
     if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ] ; then >&2 echo 'ERROR: Invalid installer checksum'; rm composer-setup.php; exit 1; fi && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
     RESULT=$? && \
-    rm composer-setup.php 
+    rm composer-setup.php
 
 RUN curl -L http://phpdoc.org/phpDocumentor.phar -o $PHARS_DIR/phpDocumentor
 RUN chmod +x $PHARS_DIR/phpDocumentor
@@ -161,7 +161,7 @@ RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 # Time Zone
 RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
-VOLUME ["/app"]
+#VOLUME ["/app"]
 WORKDIR /app
 
 # Set up the command arguments
