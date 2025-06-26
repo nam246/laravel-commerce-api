@@ -20,10 +20,10 @@ use App\Http\Controllers\UsersController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('api/user/{id}', [UsersController::class, 'getById']);
+Route::get('user/{id}', [UsersController::class, 'getById']);
 
 
-Route::get('api/articles', [ArticlesController::class, 'index']);
-Route::get('api/articles/{id}', [ArticlesController::class, 'getById']);
-Route::post('api/articles', [ArticlesController::class, 'store']);
-Route::delete('api/articles/{id}', [ArticlesController::class, 'destroy']);
+Route::get('articles', [ArticlesController::class, 'index']);
+Route::get('articles/{id}', [ArticlesController::class, 'getById']);
+Route::post('articles', [ArticlesController::class, 'store']);
+Route::delete('articles/{id}', [ArticlesController::class, 'destroy']);
