@@ -22,12 +22,6 @@ RUN mkdir -p $PHARS_DIR
 ENV PATH $PHARS_DIR:$PATH
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository universe && \
-    add-apt-repository multiverse && \
-    apt-get update
-
-RUN apt-get update && \
     apt-get install --yes --no-install-recommends \
         aspell-de \
         aspell-en \
