@@ -22,21 +22,26 @@ RUN mkdir -p $PHARS_DIR
 ENV PATH $PHARS_DIR:$PATH
 
 RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository universe && \
+    add-apt-repository multiverse && \
+    apt-get update
+
+RUN apt-get update && \
     apt-get install --yes --no-install-recommends \
         aspell-de \
         aspell-en \
         aspell-es \
         curl \
         git \
-        git \
         gzip \
         imagemagick \
         libaspell-dev \
         libbz2-dev \
-        libc-client-dev \
+        libc-client2007e-dev \
         libcurl4-gnutls-dev \
         libedit-dev \
-        libenchant-dev \
+        libenchant-2-dev \
         libfreetype6-dev \
         libgmp-dev \
         libgraphicsmagick1-dev \
@@ -44,12 +49,10 @@ RUN apt-get update && \
         libkrb5-dev \
         libldap2-dev \
         libmagickwand-dev \
-        libmcrypt-dev \
         libonig-dev \
         libpng-dev \
         libpspell-dev \
         libreadline-dev \
-        librecode-dev \
         libsnmp-dev \
         libssh2-1-dev \
         libssl-dev \
